@@ -127,7 +127,7 @@ def currently_logged():
 			status=401
 		), 401
 
-		# access to currently logged user
+	# access to currently logged user
 	else:
 		account_dict = model_to_dict(current_user)
 		account_dict.pop('password')
@@ -138,3 +138,15 @@ def currently_logged():
 			message=f"{account_dict['name']} is currently logged in",
 			status=200
 		), 200
+
+### LOGOUT ROUTE -- GET ###
+@accounts.route('/logout', methods=['GET'])
+def logout():
+	logout_user()
+
+	# response
+	return jsonify(
+		data={},
+		message="Successfully logged out!",
+		status=200
+	), 200
