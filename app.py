@@ -18,10 +18,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(account_id):
 	try:
 		print('loading the following account')
-		account = models.Account.get_by_id(accout_id)
+		account = models.Account.get_by_id(account_id)
 		return account
 
 	except models.DoesNotExist:
