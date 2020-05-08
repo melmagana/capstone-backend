@@ -17,6 +17,8 @@ class Shelter(Model):
 	city=CharField()
 	state=CharField()
 	address=CharField()
+	country=CharField()
+	about=TextField()
 
 	class Meta:
 		database = DATABASE
