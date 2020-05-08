@@ -12,9 +12,18 @@ class Account(UserMixin, Model):
 	class Meta:
 		database = DATABASE
 
+class Shelter(Model):
+	name=CharField()
+	city=CharField()
+	state=CharField()
+	address=CharField()
+
+	class Meta:
+		database = DATABASE
+
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Account], safe=True)
+	DATABASE.create_tables([Account, Shelter], safe=True)
 	print('Connected to database and created tables if they were not already there.')
 
 	DATABASE.close()
