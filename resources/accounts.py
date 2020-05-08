@@ -1,7 +1,8 @@
 import models
 from flask import Blueprint, request, jsonify
-from flask_bcrypt import generate_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash
 from playhouse.shortcuts import model_to_dict
+from flask_login import login_user, current_user
 
 accounts = Blueprint('accounts', 'accounts')
 
@@ -41,6 +42,9 @@ def register():
 		print('- ' * 30)
 		print('\nthis is create_account:', create_account)
 
+		# logs in account and starts session
+		login_user(create_account)
+
 		create_account_dict = model_to_dict(create_account)
 		print('- ' * 30)
 		print('\nthis is create_account_dict:', create_account_dict)
@@ -53,3 +57,56 @@ def register():
 			message=f"Successfully registered account for {create_account_dict['name']}",
 			status=201
 		), 201
+
+### LOGIN ROUTE -- POST ###
+@accounts.route('/login', methods=['POST'])
+def login():
+	payload = request.get_json()
+	payload['name'] = payload['name']
+	payload['email'] = payload['email']
+
+	# look up account by email
+	try:
+		account = models.Account.get(models.Account.email == payload['email'])
+		account_dict = model_to_dict(account)
+
+		# account exists, check password
+		# 1st Arg -- the encrypted password you are checking against
+		# 2nd Arg -- the password attempt you are trying to verify
+		password_is_good = check_password_hash(account_dict['password'], payload['password'])
+
+		# check if password is valid
+		if(password_is_good):
+			login_user(account)
+
+			# remove password
+			account_dict.pop('password')
+
+			# response
+			return jsonify(
+				data=account_dict,
+				message=f"{account_dict['name']} successfully logged in!",
+				status=200
+			), 200
+
+		# if password is invalid
+		else: 
+			print('password is bad')
+
+			# response
+			return jsonify(
+				data={},
+				message="Email or password is invalid",
+				status=401
+			), 401
+
+	# if user does not exist
+	except models.DoesNotExist:
+		print('account does not exist')
+
+		# response
+		return jsonify(
+			data={},
+			message="Account does not exist",
+			status=401
+		), 401

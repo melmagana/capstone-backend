@@ -17,6 +17,16 @@ login_manager = LoginManager()
 ## CONNECT APP WITH THE LOGIN MANAGER ##
 login_manager.init_app(app)
 
+@login_manager.user_loader
+def load_user(user_id):
+	try:
+		print('loading the following account')
+		account = models.Account.get_by_id(accout_id)
+		return account
+
+	except models.DoesNotExist:
+		return None
+
 
 
 ### CORS -- CROSS ORIGIN RESOURCE SHARING ###
