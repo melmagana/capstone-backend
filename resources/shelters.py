@@ -1,5 +1,6 @@
 import models
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
+from playhouse.shortcuts import model_to_dict
 
 shelters = Blueprint('shelters', 'shelters')
 
@@ -11,7 +12,7 @@ def shelters_test():
 def create_shelter():
 	payload = request.get_json()
 	print('- ' * 30)
-	print('shelters payload:', payload)
+	print('\nshelters payload:', payload)
 
 	add_shelter = models.Shelter.create(
 		name=payload['name'],
@@ -21,7 +22,16 @@ def create_shelter():
 		country=payload['country'],
 		about=payload['about']
 	)
-	print('- ' * 30)
+	print('\n- ' * 30)
 	print('this is shelter #', add_shelter)
+	print('\n- ' * 30)
+	print('this is add_shelter.__dict__:', add_shelter.__dict__)
 
-	return 'you hit the shelter create route - check terminal'
+	shelter_dict = model_to_dict(add_shelter)
+
+	# response
+	return jsonify(
+		data=shelter_dict,
+		message=f"Successfully added the shelter {shelter_dict['name']}",
+		status=201
+	), 201
