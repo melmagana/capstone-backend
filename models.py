@@ -23,6 +23,7 @@ class Shelter(Model):
 	class Meta:
 		database = DATABASE
 
+
 def initialize():
 	DATABASE.connect()
 	DATABASE.create_tables([Account, Shelter], safe=True)
