@@ -15,6 +15,9 @@ def account_test():
 def register():
 	payload= request.get_json()
 	payload['name'] = payload['name']
+	payload['city'] = payload['city']
+	payload['state'] = payload['state']
+	payload['country'] = payload['country']
 	payload['email'] = payload['email'].lower()
 	print(payload)
 
@@ -36,6 +39,9 @@ def register():
 		# create account
 		create_account = models.Account.create(
 			name=payload['name'],
+			city=payload['city'],
+			state=payload['state'],
+			country=payload['country'],
 			email=payload['email'],
 			password=pw_hash
 		)
@@ -63,6 +69,9 @@ def register():
 def login():
 	payload = request.get_json()
 	payload['name'] = payload['name']
+	payload['city'] = payload['city']
+	payload['state'] = payload['state']
+	payload['country'] = payload['country']
 	payload['email'] = payload['email']
 
 	# look up account by email
