@@ -14,6 +14,19 @@ class Account(UserMixin, Model):
 
 	class Meta:
 		database = DATABASE
+
+class Dog(Model):
+	name=CharField()
+	breed=CharField()
+	age=CharField()
+	gender=CharField()
+	personality_type=CharField()
+	shelter=CharField()
+	date_arrived=DateField()
+	status=CharField()
+
+	class Meta:
+		database = DATABASE
 		
 def initialize():
 	DATABASE.connect()

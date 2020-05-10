@@ -1,5 +1,6 @@
 from flask import Flask
 from resources.accounts import accounts
+from resources.dogs import dogs
 import models
 from flask_cors import CORS
 from flask_login import LoginManager
@@ -31,12 +32,14 @@ def load_user(account_id):
 
 ### CORS -- CROSS ORIGIN RESOURCE SHARING ###
 CORS(accounts, origins=['http://localhost:3000'], supports_credentials=True)
+CORS(dogs, origins=['http://localhost:3000'], supports_credentials=True)
 
 
 
 
 ### "CONTROLLERS" ###
 app.register_blueprint(accounts, url_prefix='/api/v1/accounts')
+app.register_blueprint(dogs, url_prefix='/api/v1/dogs')
 
 
 
