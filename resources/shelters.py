@@ -1,12 +1,35 @@
 import models
 from flask import Blueprint, request, jsonify
 from playhouse.shortcuts import model_to_dict
+from flask_login import current_user
 
 shelters = Blueprint('shelters', 'shelters')
 
+
+### SHELTER INDEX ROUTE -- GET ###
 @shelters.route('/', methods=['GET'])
-def shelters_test():
-	return 'shelters resource working'
+def shelters_index():
+
+	result = models.Shelter.select()
+	print('- ' * 30)
+	print('shelter result')
+	print(result)
+
+	shelter_dicts = [model_to_dict(shelter) for shelter in result]
+
+	for shelter_dict in shelter_dicts:
+		shelter_dict['name'].pop('password')
+
+	print('- ' * 30)
+	print('shelter_dicts')
+	print(shelter_dicts)
+
+	# response
+	return jsonify({
+		'data': shelter_dicts,
+		'message': f"Successfully found {len(shelter_dicts)} shelters",
+		'status': 200
+	}), 200
 
 
 ### CREATE SHELTER ROUTE ###
@@ -18,7 +41,7 @@ def create_shelter():
 	print(payload)
 
 	add_shelter = models.Shelter.create(
-		name=payload['name'],
+		name=current_user.id,
 		about=payload['about']
 	)
 	print('- ' * 30)
@@ -28,6 +51,7 @@ def create_shelter():
 	print('add_shelter.__dict__')
 
 	shelter_dict = model_to_dict(add_shelter)
+	shelter_dict['name'].pop('password')
 
 	# response
 	return jsonify(
