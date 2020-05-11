@@ -1,6 +1,8 @@
 import models
 from flask import Blueprint, request, jsonify
 from playhouse.shortcuts import model_to_dict
+from flask_login import current_user
+import pprint
 
 dogs = Blueprint('dogs', 'dogs')
 
@@ -9,14 +11,18 @@ dogs = Blueprint('dogs', 'dogs')
 @dogs.route('/', methods=['GET'])
 def dogs_index():
 	result = models.Dog.select()
-	print('- ' * 20)
+	print('- ' * 30)
 	print('result')
 	print(result)
 
 	dog_dicts = [model_to_dict(dog) for dog in result]
-	print('_ ' * 20)
+	print('_ ' * 30)
 	print('dog_dicts')
 	print(dog_dicts)
+
+	for dog_dict in dog_dicts:
+		# remove password
+		dog_dict['shelter'].pop('password')
 
 	# response
 	return jsonify({
@@ -32,7 +38,8 @@ def create_dog():
 	payload = request.get_json()
 	print('- ' * 30)
 	print('create_dog payload')
-	print(payload)
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint(payload)
 
 	add_dog = models.Dog.create(
 		name=payload['name'],
@@ -40,20 +47,26 @@ def create_dog():
 		age=payload['age'],
 		gender=payload['gender'],
 		personality_type=payload['personality_type'],
-		shelter=payload['shelter'],
+		shelter=current_user.id,
 		date_arrived=payload['date_arrived'],
 		status=payload['status']
 	)
 
 	print('- ' * 30)
 	print('add_dog')
-	print(add_dog)
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint(add_dog)
 	print('- ' * 30)
 	print('add_dog.__dict__')
-	print(add_dog.__dict__)
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint(add_dog.__dict__)
 
 	dog_dict = model_to_dict(add_dog)
-
+	print('- ' * 30)
+	print('dog_dict')
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint(dog_dict['shelter']['name'])
+	dog_dict['shelter']['name'].pop('password')
 	# response
 	return jsonify(
 		data=dog_dict,

@@ -2,6 +2,7 @@ import models
 from flask import Blueprint, request, jsonify
 from playhouse.shortcuts import model_to_dict
 from flask_login import current_user
+import pprint
 
 shelters = Blueprint('shelters', 'shelters')
 
@@ -16,8 +17,12 @@ def shelters_index():
 	print(result)
 
 	shelter_dicts = [model_to_dict(shelter) for shelter in result]
+	print('- ' * 30)
+	print('shelter_dicts')
+	print(shelter_dicts)
 
 	for shelter_dict in shelter_dicts:
+		# remove password
 		shelter_dict['name'].pop('password')
 
 	print('- ' * 30)
@@ -49,6 +54,7 @@ def create_shelter():
 	print(add_shelter)
 	print('- ' * 30)
 	print('add_shelter.__dict__')
+	print(add_shelter.__dict__)
 
 	shelter_dict = model_to_dict(add_shelter)
 	shelter_dict['name'].pop('password')
