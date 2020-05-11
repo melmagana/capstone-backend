@@ -6,9 +6,22 @@ from flask_login import login_user, current_user, logout_user
 
 accounts = Blueprint('accounts', 'accounts')
 
-@accounts.route('/')
-def account_test():
-	return 'accounts resource working'
+@accounts.route('/', methods=['GET'])
+def account_index():
+
+	accounts = models.Account.select()
+	account_dicts = [model_to_dict(account) for account in accounts]
+
+	# remove password
+	for account_dict in account_dicts:
+		account_dict.pop('password')
+	
+	print(account_dicts)
+
+	# response
+	return jsonify(
+		account_dicts
+	), 200
 
 ### REGISTER ROUTE -- POST ###
 @accounts.route('/register', methods=['POST'])

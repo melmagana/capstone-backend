@@ -18,7 +18,7 @@ class Account(UserMixin, Model):
 
 
 class Shelter(Model):
-	name=CharField()
+	name=ForeignKeyField(Account, backref='shelters')
 	about=TextField()
 
 	class Meta:
@@ -31,7 +31,7 @@ class Dog(Model):
 	age=CharField()
 	gender=CharField()
 	personality_type=CharField()
-	shelter=CharField()
+	shelter=ForeignKeyField(Shelter, backref='dogs')
 	date_arrived=DateField(formats=['%Y-%m-%d'])
 	status=CharField()
 
