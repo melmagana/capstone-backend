@@ -75,3 +75,30 @@ def delete_dog(id):
 		status=200
 	), 200
 
+
+### UPDATE DOG ROUTE -- PUT ###
+@dogs.route('/<id>', methods=['PUT'])
+def update_dog(id):
+	payload = request.get_json()
+	update_query = models.Dog.update(
+		name=payload['name'],
+		breed=payload['breed'],
+		age=payload['age'],
+		gender=payload['gender'],
+		personality_type=payload['personality_type'],
+		shelter=payload['shelter'],
+		date_arrived=payload['date_arrived'],
+		status=payload['status']
+	).where(models.Dog.id == id)
+
+	num_of_rows_updated = update_query.execute()
+
+	updated_dog = models.Dog.get_by_id(id)
+	updated_dog_dict = model_to_dict(updated_dog)
+
+	# response
+	return jsonify(
+		data=updated_dog_dict,
+		message=f"Successfully updated a dog with the id of {id}",
+		status=200
+	), 200
