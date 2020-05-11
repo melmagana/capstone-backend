@@ -19,6 +19,8 @@ def register():
 	payload['state'] = payload['state']
 	payload['country'] = payload['country']
 	payload['email'] = payload['email'].lower()
+	payload['shelter'] = payload['shelter']
+	payload['adopter'] = payload['adopter']
 	print(payload)
 
 	# check if user exists
@@ -43,7 +45,9 @@ def register():
 			state=payload['state'],
 			country=payload['country'],
 			email=payload['email'],
-			password=pw_hash
+			password=pw_hash,
+			shelter=payload['shelter'],
+			adopter=payload['adopter']
 		)
 		print('- ' * 30)
 		print('\nthis is create_account:', create_account)
@@ -73,6 +77,8 @@ def login():
 	payload['state'] = payload['state']
 	payload['country'] = payload['country']
 	payload['email'] = payload['email']
+	payload['shelter'] = payload['shelter']
+	payload['adopter'] = payload['adopter']
 
 	# look up account by email
 	try:

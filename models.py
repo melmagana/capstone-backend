@@ -10,10 +10,12 @@ class Account(UserMixin, Model):
 	country=CharField()
 	email=CharField(unique=True)
 	password=CharField()
-
+	shelter=BooleanField()
+	adopter=BooleanField()
 
 	class Meta:
 		database = DATABASE
+
 
 class Dog(Model):
 	name=CharField()
@@ -22,15 +24,16 @@ class Dog(Model):
 	gender=CharField()
 	personality_type=CharField()
 	shelter=CharField()
-	date_arrived=DateField()
+	date_arrived=DateField(formats=['%Y-%m-%d'])
 	status=CharField()
 
 	class Meta:
 		database = DATABASE
+
 		
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Account], safe=True)
+	DATABASE.create_tables([Account, Dog], safe=True)
 	print('Connected to database and created tables if they were not already there.')
 
 	DATABASE.close()
