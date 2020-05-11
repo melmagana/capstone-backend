@@ -19,6 +19,7 @@ class Account(UserMixin, Model):
 
 class Shelter(Model):
 	name=CharField()
+	about=TextField()
 
 	class Meta:
 		database = DATABASE

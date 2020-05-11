@@ -57,7 +57,7 @@ def create_dog():
 	# response
 	return jsonify(
 		data=dog_dict,
-		message=f"Successfully addded {dog_dict['name']}",
+		message=f"Successfully added {dog_dict['name']}",
 		status=201
 	), 201
 
