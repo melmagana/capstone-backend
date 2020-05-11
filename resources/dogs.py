@@ -60,3 +60,18 @@ def create_dog():
 		message=f"Successfully addded {dog_dict['name']}",
 		status=201
 	), 201
+
+
+### DESTROY DOG ROUTE -- DELETE ###
+@dogs.route('/<id>', methods=['DELETE'])
+def delete_dog(id):
+	delete_query = models.Dog.delete().where(models.Dog.id == id)
+	num_of_rows_deleted = delete_query.execute()
+
+	# response
+	return jsonify(
+		data={},
+		message=f"Successfully deleted {num_of_rows_deleted} dog with id of {id}",
+		status=200
+	), 200
+
