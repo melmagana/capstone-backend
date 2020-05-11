@@ -17,6 +17,13 @@ class Account(UserMixin, Model):
 		database = DATABASE
 
 
+class Shelter(Model):
+	name=CharField()
+
+	class Meta:
+		database = DATABASE
+
+
 class Dog(Model):
 	name=CharField()
 	breed=CharField()
@@ -33,7 +40,7 @@ class Dog(Model):
 		
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Account, Dog], safe=True)
+	DATABASE.create_tables([Account, Dog, Shelter], safe=True)
 	print('Connected to database and created tables if they were not already there.')
 
 	DATABASE.close()
