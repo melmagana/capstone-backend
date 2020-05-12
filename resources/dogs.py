@@ -56,41 +56,53 @@ def our_dogs_index():
 @dogs.route('/', methods=['POST'])
 @login_required
 def create_dog():
-	payload = request.get_json()
-	print('- ' * 30)
-	print('create_dog payload')
-	print(payload)
+	# logic if user is not a shelter
+	if current_user.shelter == False:
 
-	add_dog = models.Dog.create(
-		name=payload['name'],
-		breed=payload['breed'],
-		age=payload['age'],
-		gender=payload['gender'],
-		personality_type=payload['personality_type'],
-		shelter=current_user.id,
-		date_arrived=payload['date_arrived'],
-		status=payload['status']
-	)
+		#response
+		return jsonify({
+			'data': {},
+			'message': "Not allowed, must be a shelter to add a dog",
+			'status': 401
+		}), 401
 
-	print('- ' * 30)
-	print('add_dog')
-	print(add_dog)
-	print('- ' * 30)
-	print('add_dog.__dict__')
-	print(add_dog.__dict__)
+	# logic if user is a shelter
+	else:
+		payload = request.get_json()
+		print('- ' * 30)
+		print('create_dog payload')
+		print(payload)
 
-	dog_dict = model_to_dict(add_dog)
-	print('- ' * 30)
-	print('dog_dict')
-	print(dog_dict['shelter'])
-	dog_dict['shelter'].pop('password')
+		add_dog = models.Dog.create(
+			name=payload['name'],
+			breed=payload['breed'],
+			age=payload['age'],
+			gender=payload['gender'],
+			personality_type=payload['personality_type'],
+			shelter=current_user.id,
+			date_arrived=payload['date_arrived'],
+			status=payload['status']
+		)
 
-	# response
-	return jsonify(
-		data=dog_dict,
-		message=f"Successfully added {dog_dict['name']}",
-		status=201
-	), 201
+		print('- ' * 30)
+		print('add_dog')
+		print(add_dog)
+		print('- ' * 30)
+		print('add_dog.__dict__')
+		print(add_dog.__dict__)
+
+		dog_dict = model_to_dict(add_dog)
+		print('- ' * 30)
+		print('dog_dict')
+		print(dog_dict['shelter'])
+		dog_dict['shelter'].pop('password')
+
+		# response
+		return jsonify(
+			data=dog_dict,
+			message=f"Successfully added {dog_dict['name']}",
+			status=201
+		), 201
 
 
 ### DESTROY DOG ROUTE -- DELETE ###
