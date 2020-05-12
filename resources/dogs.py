@@ -109,44 +109,56 @@ def create_dog():
 @dogs.route('/<id>', methods=['DELETE'])
 @login_required
 def delete_dog(id):
-	try:
-		# retrieve dog
-		dog_to_delete = models.Dog.get_by_id(id)
+	# logic if user is not a shelter
+	if current_user.shelter == False:
 
-		# logic to see if dog belongs to current user
-		if dog_to_delete.shelter.id == current_user.id:
-			dog_to_delete.delete_instance()
+		# response
+		return jsonify(
+			data={},
+			message="Not allowed, must be shelter to delete a dog",
+			status=401
+		), 401
 
-			# response
-			return jsonify(
-				data={},
-				message=f"Successfully deleted dog with id of {id}",
-				status=200
-			),200
+	# logic if user is a shelter
+	else:
+		try:
+			# retrieve dog
+			dog_to_delete = models.Dog.get_by_id(id)
 
-		# logic if dog does not belong to current user
-		else:
+			# logic to see if dog belongs to current user
+			if dog_to_delete.shelter.id == current_user.id:
+				dog_to_delete.delete_instance()
 
-			# response
+				# response
+				return jsonify(
+					data={},
+					message=f"Successfully deleted dog with id of {id}",
+					status=200
+				),200
+
+			# logic if dog does not belong to current user
+			else:
+
+				# response
+				return jsonify(
+					data={
+						'error': '403 Forbidden'
+					},
+					message="Dog ID does not match user ID. Users can only delete their own dogs.",
+					status=403
+				), 403
+
+			# logic if dog does not even exist
+		except models.DoesNotExist:
+
+			#response
 			return jsonify(
 				data={
-					'error': '403 Forbidden'
+					'error': '404 Not Found'
 				},
-				message="Dog ID does not match user ID. Users can only delete their own dogs.",
-				status=403
-			), 403
-
-		# logic if dog does not even exist
-	except models.DoesNotExist:
-
-		#response
-		return jsonify(
-			data={
-				'error': '404 Not Found'
-			},
-			message="There is no dog with that ID",
-			status=404
-		), 404
+				message="There is no dog with that ID",
+				status=404
+			), 404
 
 
 ### DOG UPDATE ROUTE -- PUT ###
