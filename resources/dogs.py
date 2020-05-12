@@ -189,3 +189,18 @@ def update_dog(id):
 			status=403
 
 		), 403
+
+
+### DOG SHOW ROUTE -- GET ###
+@dogs.route('/<id>', methods=['GET'])
+def show_dog(id):
+	dog = models.Dog.get_by_id(id)
+
+	dog_dict = model_to_dict(dog)
+	dog_dict['shelter'].pop('password')
+
+	return jsonify(
+		data=dog_dict,
+		message=f"Found dog with id of {id}",
+		status=200
+	), 200

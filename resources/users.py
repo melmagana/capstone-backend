@@ -161,20 +161,6 @@ def currently_logged():
 ### END OF TEMPORARY ROUTE ###
 
 
-### LOGOUT ROUTE -- GET ###
-@users.route('/logout', methods=['GET'])
-def logout():
-	
-	logout_user()
-
-	# response
-	return jsonify(
-		data={},
-		message="Successfully logged out!",
-		status=200
-	), 200
-
-
 ### USER SHOW ROUTE -- GET ###
 @users.route('/<id>', methods=['GET'])
 def show_user(id):
@@ -188,3 +174,16 @@ def show_user(id):
 		status=200
 	), 200
 
+
+### LOGOUT ROUTE -- GET ###
+@users.route('/logout', methods=['GET'])
+def logout():
+	
+	logout_user()
+
+	# response
+	return jsonify(
+		data={},
+		message="Successfully logged out!",
+		status=200
+	), 200
