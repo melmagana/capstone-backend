@@ -56,6 +56,7 @@ def our_dogs_index():
 @dogs.route('/', methods=['POST'])
 @login_required
 def create_dog():
+
 	# logic if user is not a shelter
 	if current_user.shelter == False:
 
@@ -109,6 +110,7 @@ def create_dog():
 @dogs.route('/<id>', methods=['DELETE'])
 @login_required
 def delete_dog(id):
+
 	# logic if user is not a shelter
 	if current_user.shelter == False:
 
@@ -165,54 +167,67 @@ def delete_dog(id):
 @dogs.route('/<id>', methods=['PUT'])
 @login_required
 def update_dog(id):
-	payload = request.get_json()
-	dog_to_update = models.Dog.get_by_id(id)
 
-	# logic to see if dog belongs to current user
-	if dog_to_update.shelter.id == current_user.id:
-
-		# then update
-		if 'name' in payload:
-			dog_to_update.name = payload['name']
-		if 'breed' in payload:
-			dog_to_update.breed = payload['breed']
-		if 'age' in payload:
-			dog_to_update.age = payload['age']
-		if 'gender' in payload:
-			dog_to_update.gender = payload['gender']
-		if 'personality_type' in payload:
-			dog_to_update.personality_type = payload['personality_type']
-		if 'date_arrived' in payload:
-			dog_to_update.date_arrived = payload['date_arrived']
-		if 'status' in payload:
-			dog_to_update.status = payload['status']
-
-		dog_to_update.save()
-
-		updated_dog_dict = model_to_dict(dog_to_update)
-
-		# remove password
-		updated_dog_dict['shelter'].pop('password')
+	# logic if user is not a shelter
+	if current_user.shelter == False:
 
 		# response
 		return jsonify(
-			data=updated_dog_dict,
-			message=f"Successfully updated {updated_dog_dict['name']}",
-			status=200
-		), 200
+			data={},
+			message="Not allowed, must be shelter to update a dog",
+			status=401
+		), 401
 
-	#logic if dog does not belong to current user
+	# logic is user is a shelter
 	else:
+		payload = request.get_json()
+		dog_to_update = models.Dog.get_by_id(id)
 
-		# response
-		return jsonify(
-			data={
-				'error': '403 Forbidden'
-			},
-			message="Dog ID does not match user ID. Users can only update their own dogs.",
-			status=403
+		# logic to see if dog belongs to current user
+		if dog_to_update.shelter.id == current_user.id:
 
-		), 403
+			# then update
+			if 'name' in payload:
+				dog_to_update.name = payload['name']
+			if 'breed' in payload:
+				dog_to_update.breed = payload['breed']
+			if 'age' in payload:
+				dog_to_update.age = payload['age']
+			if 'gender' in payload:
+				dog_to_update.gender = payload['gender']
+			if 'personality_type' in payload:
+				dog_to_update.personality_type = payload['personality_type']
+			if 'date_arrived' in payload:
+				dog_to_update.date_arrived = payload['date_arrived']
+			if 'status' in payload:
+				dog_to_update.status = payload['status']
+
+			dog_to_update.save()
+
+			updated_dog_dict = model_to_dict(dog_to_update)
+
+			# remove password
+			updated_dog_dict['shelter'].pop('password')
+
+			# response
+			return jsonify(
+				data=updated_dog_dict,
+				message=f"Successfully updated {updated_dog_dict['name']}",
+				status=200
+			), 200
+
+		#logic if dog does not belong to current user
+		else:
+
+			# response
+			return jsonify(
+				data={
+					'error': '403 Forbidden'
+				},
+				message="Dog ID does not match user ID. Users can only update their own dogs.",
+				status=403
+
+			), 403
 
 
 ### DOG SHOW ROUTE -- GET ###

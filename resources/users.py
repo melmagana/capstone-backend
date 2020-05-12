@@ -137,8 +137,6 @@ def login():
 @users.route('/logged_in_user', methods=['GET'])
 def currently_logged():
 	print(current_user)
-	print('is current_user a shelter')
-	print(current_user.shelter)
 	# current_user.is_authenticated allows you to see whether a user is logged in
 	if not current_user.is_authenticated:
 
