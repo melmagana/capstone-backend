@@ -1,8 +1,7 @@
 import models
 from flask import Blueprint, request, jsonify
 from playhouse.shortcuts import model_to_dict
-from flask_login import current_user
-import pprint
+from flask_login import current_user, login_required
 
 dogs = Blueprint('dogs', 'dogs')
 
@@ -21,6 +20,7 @@ def dogs_index():
 	print(dog_dicts)
 
 	for dog_dict in dog_dicts:
+
 		# remove password
 		dog_dict['shelter'].pop('password')
 
@@ -32,14 +32,34 @@ def dogs_index():
 		}), 200
 
 
+### DOG INDEX ROUTE (LOGGED IN USER) -- GET ###
+@dogs.route('/our_dogs', methods=['GET'])
+@login_required
+def our_dogs_index():
+	current_user_dog_dicts = [model_to_dict(dog) for dog in current_user.dogs]
+
+	for dog_dict in current_user_dog_dicts:
+		dog_dict['shelter'].pop('password')
+	print('- ' * 30)
+	print('current_user_dog_dicts')
+	print(current_user_dog_dicts)
+
+	# response
+	return jsonify({
+		'data': current_user_dog_dicts,
+		'message': f"Successfully found {len(current_user_dog_dicts)} dog(s)",
+		'status': 200
+	}), 200
+
+
 ### CREATE DOG ROUTE -- POST ###
 @dogs.route('/', methods=['POST'])
+@login_required
 def create_dog():
 	payload = request.get_json()
 	print('- ' * 30)
 	print('create_dog payload')
-	pp = pprint.PrettyPrinter(indent=4)
-	pp.pprint(payload)
+	print(payload)
 
 	add_dog = models.Dog.create(
 		name=payload['name'],
@@ -54,19 +74,17 @@ def create_dog():
 
 	print('- ' * 30)
 	print('add_dog')
-	pp = pprint.PrettyPrinter(indent=4)
-	pp.pprint(add_dog)
+	print(add_dog)
 	print('- ' * 30)
 	print('add_dog.__dict__')
-	pp = pprint.PrettyPrinter(indent=4)
-	pp.pprint(add_dog.__dict__)
+	print(add_dog.__dict__)
 
 	dog_dict = model_to_dict(add_dog)
 	print('- ' * 30)
 	print('dog_dict')
-	pp = pprint.PrettyPrinter(indent=4)
-	pp.pprint(dog_dict['shelter']['name'])
-	dog_dict['shelter']['name'].pop('password')
+	print(dog_dict['shelter'])
+	dog_dict['shelter'].pop('password')
+
 	# response
 	return jsonify(
 		data=dog_dict,
@@ -77,41 +95,97 @@ def create_dog():
 
 ### DESTROY DOG ROUTE -- DELETE ###
 @dogs.route('/<id>', methods=['DELETE'])
+@login_required
 def delete_dog(id):
-	delete_query = models.Dog.delete().where(models.Dog.id == id)
-	num_of_rows_deleted = delete_query.execute()
+	try:
+		# retrieve dog
+		dog_to_delete = models.Dog.get_by_id(id)
 
-	# response
-	return jsonify(
-		data={},
-		message=f"Successfully deleted {num_of_rows_deleted} dog with id of {id}",
-		status=200
-	), 200
+		# logic to see if dog belongs to current user
+		if dog_to_delete.shelter.id == current_user.id:
+			dog_to_delete.delete_instance()
+
+			# response
+			return jsonify(
+				data={},
+				message=f"Successfully deleted dog with id of {id}",
+				status=200
+			),200
+
+		# logic if dog does not belong to current user
+		else:
+
+			# response
+			return jsonify(
+				data={
+					'error': '403 Forbidden'
+				},
+				message="Dog ID does not match user ID. Users can only delete their own dogs.",
+				status=403
+			), 403
+
+		# logic if dog does not even exist
+	except models.DoesNotExist:
+
+		#response
+		return jsonify(
+			data={
+				'error': '404 Not Found'
+			},
+			message="There is no dog with that ID",
+			status=404
+		), 404
 
 
-### UPDATE DOG ROUTE -- PUT ###
+### DOG UPDATE ROUTE -- PUT ###
 @dogs.route('/<id>', methods=['PUT'])
+@login_required
 def update_dog(id):
 	payload = request.get_json()
-	update_query = models.Dog.update(
-		name=payload['name'],
-		breed=payload['breed'],
-		age=payload['age'],
-		gender=payload['gender'],
-		personality_type=payload['personality_type'],
-		shelter=payload['shelter'],
-		date_arrived=payload['date_arrived'],
-		status=payload['status']
-	).where(models.Dog.id == id)
+	dog_to_update = models.Dog.get_by_id(id)
 
-	num_of_rows_updated = update_query.execute()
+	# logic to see if dog belongs to current user
+	if dog_to_update.shelter.id == current_user.id:
 
-	updated_dog = models.Dog.get_by_id(id)
-	updated_dog_dict = model_to_dict(updated_dog)
+		# then update
+		if 'name' in payload:
+			dog_to_update.name = payload['name']
+		if 'breed' in payload:
+			dog_to_update.breed = payload['breed']
+		if 'age' in payload:
+			dog_to_update.age = payload['age']
+		if 'gender' in payload:
+			dog_to_update.gender = payload['gender']
+		if 'personality_type' in payload:
+			dog_to_update.personality_type = payload['personality_type']
+		if 'date_arrived' in payload:
+			dog_to_update.date_arrived = payload['date_arrived']
+		if 'status' in payload:
+			dog_to_update.status = payload['status']
 
-	# response
-	return jsonify(
-		data=updated_dog_dict,
-		message=f"Successfully updated a dog with the id of {id}",
-		status=200
-	), 200
+		dog_to_update.save()
+
+		updated_dog_dict = model_to_dict(dog_to_update)
+
+		# remove password
+		updated_dog_dict['shelter'].pop('password')
+
+		# response
+		return jsonify(
+			data=updated_dog_dict,
+			message=f"Successfully updated {updated_dog_dict['name']}",
+			status=200
+		), 200
+
+	#logic if dog does not belong to current user
+	else:
+
+		# response
+		return jsonify(
+			data={
+				'error': '403 Forbidden'
+			},
+			message="Dog ID does not match user ID. Users can only update their own dogs.",
+			status=403
+
+		), 403

@@ -3,7 +3,7 @@ from flask_login import UserMixin
 
 DATABASE = SqliteDatabase('adoptions.sqlite')
 
-class Account(UserMixin, Model):
+class User(UserMixin, Model):
 	name=CharField()
 	city=CharField()
 	state=CharField()
@@ -11,15 +11,6 @@ class Account(UserMixin, Model):
 	email=CharField(unique=True)
 	password=CharField()
 	shelter=BooleanField()
-	adopter=BooleanField()
-
-	class Meta:
-		database = DATABASE
-
-
-class Shelter(Model):
-	name=ForeignKeyField(Account, backref='shelters')
-	about=TextField()
 
 	class Meta:
 		database = DATABASE
@@ -31,7 +22,7 @@ class Dog(Model):
 	age=CharField()
 	gender=CharField()
 	personality_type=CharField()
-	shelter=ForeignKeyField(Shelter, backref='dogs')
+	shelter=ForeignKeyField(User, backref='dogs')
 	date_arrived=DateField(formats=['%Y-%m-%d'])
 	status=CharField()
 
@@ -41,7 +32,7 @@ class Dog(Model):
 		
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Account, Dog, Shelter], safe=True)
+	DATABASE.create_tables([User, Dog], safe=True)
 	print('Connected to database and created tables if they were not already there.')
 
 	DATABASE.close()

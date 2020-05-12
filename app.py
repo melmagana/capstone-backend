@@ -1,7 +1,6 @@
 from flask import Flask
-from resources.accounts import accounts
+from resources.users import users
 from resources.dogs import dogs
-from resources.shelters import shelters
 import models
 from flask_cors import CORS
 from flask_login import LoginManager
@@ -20,29 +19,40 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 @login_manager.user_loader
-def load_user(account_id):
+def load_user(user_id):
 	try:
-		print('loading the following account')
-		account = models.Account.get_by_id(account_id)
-		return account
+		print('loading the following user')
+		user = models.User.get_by_id(user_id)
+		return user
 
 	except models.DoesNotExist:
 		return None
 
 
+@login_manager.unauthorized_handler
+def unauthorized():
+
+	# response
+	return jsonify(
+		data={
+			'error': 'User not logged in'
+		},
+		message="You must have an account to access this resource",
+		status=401
+	), 401
+
+
 
 ### CORS -- CROSS ORIGIN RESOURCE SHARING ###
-CORS(accounts, origins=['http://localhost:3000'], supports_credentials=True)
+CORS(users, origins=['http://localhost:3000'], supports_credentials=True)
 CORS(dogs, origins=['http://localhost:3000'], supports_credentials=True)
-CORS(shelters, origins=['http://localhost:3000'], supports_credentials=True)
 
 
 
 
 ### "CONTROLLERS" ###
-app.register_blueprint(accounts, url_prefix='/api/v1/accounts')
+app.register_blueprint(users, url_prefix='/api/v1/users')
 app.register_blueprint(dogs, url_prefix='/api/v1/dogs')
-app.register_blueprint(shelters, url_prefix='/api/v1/shelters')
 
 
 
