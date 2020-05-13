@@ -82,7 +82,8 @@ def create_dog():
 			personality_type=payload['personality_type'],
 			shelter=current_user.id,
 			date_arrived=payload['date_arrived'],
-			status=payload['status']
+			status=payload['status'],
+			image=payload['image']
 		)
 
 		print('- ' * 30)
@@ -201,6 +202,8 @@ def update_dog(id):
 				dog_to_update.date_arrived = payload['date_arrived']
 			if 'status' in payload:
 				dog_to_update.status = payload['status']
+			if 'image' in payload:
+				dog_to_update.image = payload['image']
 
 			dog_to_update.save()
 

@@ -25,6 +25,7 @@ class Dog(Model):
 	shelter=ForeignKeyField(User, backref='dogs')
 	date_arrived=DateField(formats=['%Y-%m-%d'])
 	status=CharField()
+	image=TextField()
 
 	class Meta:
 		database = DATABASE
