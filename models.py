@@ -30,10 +30,18 @@ class Dog(Model):
 	class Meta:
 		database = DATABASE
 
+
+class Interest(Model):
+	user=ForeignKeyField(User, backref='interests')
+	dog=ForeignKeyField(Dog, backref='interests')
+
+	class Meta:
+		database = DATABASE
+
 		
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([User, Dog], safe=True)
+	DATABASE.create_tables([User, Dog, Interest], safe=True)
 	print('Connected to database and created tables if they were not already there.')
 
 	DATABASE.close()

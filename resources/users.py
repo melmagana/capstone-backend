@@ -104,7 +104,7 @@ def login():
 
 			# remove password
 			user_dict.pop('password')
-
+			print(user_dict)
 			# response
 			return jsonify(
 				data=user_dict,
@@ -184,5 +184,22 @@ def logout():
 	return jsonify(
 		data={},
 		message="Successfully logged out!",
+		status=200
+	), 200
+
+
+### INTERESTED ROUTE -- GET ###
+@users.route('/interests/<id>', methods=['GET'])
+def get_interests(id):
+	interests_query = models.Interest.select().where(models.Interest.user_id == id)
+	print('this is the interests_query')
+	print(interests_query)
+	users_interests = [model_to_dict(i)['dog'] for i in interests_query]
+	print(users_interests)
+
+		# response
+	return jsonify(
+		data=users_interests,
+		message=f"interested in {len(users_interests)} dogs",
 		status=200
 	), 200

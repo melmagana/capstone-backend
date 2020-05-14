@@ -179,7 +179,7 @@ def update_dog(id):
 			status=401
 		), 401
 
-	# logic is user is a shelter
+	# logic if user is a shelter
 	else:
 		payload = request.get_json()
 		dog_to_update = models.Dog.get_by_id(id)
@@ -246,3 +246,35 @@ def show_dog(id):
 		message=f"Found dog with id of {id}",
 		status=200
 	), 200
+
+
+### ADD INTEREST ###
+@dogs.route('/interests/<id>', methods=['POST'])
+@login_required
+def add_interest(id):
+
+	try:
+		interest_to_add = (models.Interest.get((models.Interest.user_id == current_user.id) & (models.Interest.dog_id == id)))
+		print(interest_to_add.user_id)
+		print(model_to_dict(interest_to_add))
+		print(current_user.id)
+
+		# response
+		return jsonify(
+			data={},
+			message="Dog already an interest",
+			status=401
+		), 401
+	except models.DoesNotExist:
+		models.Interest.create(
+			user=current_user.id,
+			dog=id
+		)
+
+		# response
+		return jsonify(
+			data={},
+			message="Interested",
+			status=200
+		), 200
+
