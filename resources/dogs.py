@@ -281,6 +281,7 @@ def add_interest(id):
 
 ### DELETE INTEREST ###
 @dogs.route('/interests/<id>', methods=['DELETE'])
+@login_required
 def delete_interest(id):
 	try:
 		interest_to_delete = models.Interest.get((models.Interest.user_id == current_user.id) & (models.Interest.dog_id == id))
