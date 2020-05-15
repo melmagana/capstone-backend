@@ -274,7 +274,29 @@ def add_interest(id):
 		# response
 		return jsonify(
 			data={},
-			message="Interested",
+			message="Dog has now been added as an interest",
 			status=200
 		), 200
 
+
+### DELETE INTEREST ###
+@dogs.route('/interests/<id>', methods=['DELETE'])
+def delete_interest(id):
+	try:
+		interest_to_delete = models.Interest.get((models.Interest.user_id == current_user.id) & (models.Interest.dog_id == id))
+		interest_to_delete.delete_instance()
+
+		# response
+		return jsonify(
+			data={},
+			message="Deleted dog interest",
+			status=200
+		), 200
+	except models.DoesNotExist:
+
+		# response
+		return jsonify(
+			data={},
+			message="Interest does not exist, therefore cannot delete",
+			status=401
+		), 401
