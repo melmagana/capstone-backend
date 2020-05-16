@@ -1,4 +1,5 @@
-from flask import Flask
+import os
+from flask import Flask, g
 from resources.users import users
 from resources.dogs import dogs
 import models
@@ -56,10 +57,32 @@ app.register_blueprint(dogs, url_prefix='/api/v1/dogs')
 
 
 
+### PSTGRESQL ###
+@app.before_request
+def before_request():
+	"""Connect to the database before each request"""
+	print('you should see this before each request')
+	g.db = models.DATABASE
+	g.db.connect()
+
+@app.after_request
+def after_request(response):
+	"""Close the database connection after each request"""
+	print('you should see this after each request')
+	g.db.close()
+	return response
+
+
+
 
 @app.route('/')
 def hello():
 	return 'Hello, World!'
+
+
+if 'ON_HEROKU' in os.environ:
+	print('\non heroku!')
+	models.initialize()
 
 if __name__ == '__main__':
 	models.initialize()
