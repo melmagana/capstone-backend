@@ -45,8 +45,8 @@ def unauthorized():
 
 
 ### CORS -- CROSS ORIGIN RESOURCE SHARING ###
-CORS(users, origins=['http://localhost:3000'], supports_credentials=True)
-CORS(dogs, origins=['http://localhost:3000'], supports_credentials=True)
+CORS(users, origins=['http://localhost:3000', 'https://perritos-camperos.herokuapp.com'], supports_credentials=True)
+CORS(dogs, origins=['http://localhost:3000', 'https://perritos-camperos.herokuapp.com'], supports_credentials=True)
 
 
 
