@@ -188,7 +188,6 @@ def logout():
 	), 200
 
 
-### INTERESTED ROUTE -- GET ###
 @users.route('/interests/<id>', methods=['GET'])
 def get_interests(id):
 	interests_query = models.Interest.select().where(models.Interest.user_id == id)
@@ -202,4 +201,4 @@ def get_interests(id):
 		data=users_interests,
 		message=f"interested in {len(users_interests)} dogs",
 		status=200
-	), 200
+	), 200 
