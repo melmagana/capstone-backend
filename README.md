@@ -1,2 +1,2 @@
 # capstone-backend
-![alt text](https://i.imgur.com/x1tJJ5A.png "Database")
+![alt text](https://i.imgur.com/RX5hsRC.png "Database")
